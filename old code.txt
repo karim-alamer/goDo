@@ -1,0 +1,143 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:go_do/app/modules/home/views/widgets/home_body_widget.dart';
+import 'package:go_do/app/modules/home/views/widgets/add_task_bar_widget.dart';
+import 'package:go_do/app/modules/home/views/widgets/calendar_widget.dart';
+import '../../../../theme.dart';
+import '../../../../ui/widgets/shared/widgets/app_bar_widget.dart';
+import '../controllers/home_controller.dart';
+import '../controllers/theme_controller.dart';
+
+class HomeView extends GetView<HomeController> {
+  const HomeView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+    return Scaffold(
+      key: _scaffoldKey,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(50),
+        child: AppBar(
+          elevation: 0,
+          backgroundColor: context.theme.colorScheme.background,
+          leading: Obx(() => Switch(
+                value: Get.find<ThemeController>().isDarkMode.value,
+                onChanged: (value) async {
+                  await Get.find<ThemeController>().toggleTheme();
+
+                  Get.changeTheme(Get.find<ThemeController>().isDarkMode.value
+                      ? AppTheme.dark
+                      : AppTheme.light);
+                },
+                thumbIcon: MaterialStateProperty.resolveWith<Icon?>(
+                  (Set<MaterialState> states) {
+                    if (states.contains(MaterialState.selected)) {
+                      return const Icon(Icons.brightness_2);
+                    }
+
+                    return const Icon(
+                      Icons.brightness_4_outlined,
+                      color: Colors.grey,
+                      size: 25,
+                    );
+                  },
+                ),
+              )),
+          actions: [
+            IconButton(
+              icon: const Icon(
+                Icons.person,
+                size: 25,
+                color: Colors.grey,
+              ),
+              onPressed: () {
+                _scaffoldKey.currentState?.openEndDrawer();
+              },
+            ),
+          ],
+        ),
+
+        //  AppBarWidget()
+      ),
+      body: Column(
+        children: [
+          const AddTaskBarWidget(),
+          const AddCalendarWidget(),
+          HomeBodyWidget(contoller: controller),
+        ],
+      ),
+      endDrawer: Drawer(
+        child: ListView(
+          padding: const EdgeInsets.all(0),
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.lightBlue,
+              ),
+              child: UserAccountsDrawerHeader(
+                decoration: BoxDecoration(color: Colors.lightBlue),
+                accountName: Text(
+                  "Karim Alamir",
+                  style: TextStyle(fontSize: 18),
+                ),
+                accountEmail: Text("karimalamairahmad@gmail.com"),
+                currentAccountPictureSize: Size.square(50),
+                currentAccountPicture: CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: Text(
+                    "A",
+                    style: TextStyle(fontSize: 30.0, color: Colors.blue),
+                  ),
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text(' My Profile '),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.language),
+              title: const Text(' Language '),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.brightness_2),
+              title: const Text(' Mode '),
+              onTap: () async {
+                await Get.find<ThemeController>().toggleTheme();
+                Get.changeTheme(
+                  Get.find<ThemeController>().isDarkMode.value
+                      ? AppTheme.dark
+                      : AppTheme.light,
+                );
+                Navigator.pop(context);
+              },
+            ),
+
+            //  ListTile(
+            //   leading: const Icon(Icons.brightness_2),
+            //   title: const Text(' Mode '),
+            //   onTap: () {
+            //     Navigator.pop(context);
+            //   },
+            // ),
+
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('LogOut'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
