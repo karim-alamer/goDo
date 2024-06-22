@@ -1,4 +1,10 @@
 # go_do
+
+
+A new Flutter project.
+
+## Getting Started
+
 ![todoimg1](https://github.com/karim-alamer/goDo/assets/81974793/4d7f3f34-65f7-40a4-ae76-303bc861dff5)
 ![todoimg2](https://github.com/karim-alamer/goDo/assets/81974793/ccfef20b-7943-46c4-9fb1-ca4cb12364e0)
 ![todoimg3](https://github.com/karim-alamer/goDo/assets/81974793/e370a5a4-573e-4643-8353-b25faef1060e)
@@ -9,9 +15,6 @@
 ![todoimg8](https://github.com/karim-alamer/goDo/assets/81974793/15d30758-6972-445e-a8de-eb4e1db7373f)
 ![todoimg9](https://github.com/karim-alamer/goDo/assets/81974793/70d4cb67-044b-4a73-bde6-bfcde6d6bfdf)
 
-A new Flutter project.
-
-## Getting Started
 
 This project is a starting point for a Flutter application.
 
