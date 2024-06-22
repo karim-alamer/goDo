@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 import 'dart:ui';
 
@@ -14,6 +13,17 @@ class TaskModel {
   final int colorindex;
   final int? isCompleted;
   Color? taskColor;
+  final String category;
+
+  // List of valid categories
+  static const List<String> categories = [
+    "Task",
+    "Study",
+    "Sport",
+    "Health",
+    "Work"
+  ];
+
   TaskModel({
     this.id,
     required this.title,
@@ -26,7 +36,13 @@ class TaskModel {
     required this.colorindex,
     this.isCompleted,
     this.taskColor,
-  });
+    required this.category,
+    // Default category
+  }) : assert(
+            categories
+                .map((cat) => cat.toLowerCase())
+                .contains(category.toLowerCase()),
+            'Invalid category');
 
   TaskModel copyWith({
     int? id,
@@ -40,6 +56,7 @@ class TaskModel {
     int? colorindex,
     int? isCompleted,
     Color? taskColor,
+    String? category,
   }) {
     return TaskModel(
       id: id ?? this.id,
@@ -53,6 +70,7 @@ class TaskModel {
       colorindex: colorindex ?? this.colorindex,
       isCompleted: isCompleted ?? this.isCompleted,
       taskColor: taskColor ?? this.taskColor,
+      category: category ?? this.category,
     );
   }
 
@@ -69,24 +87,27 @@ class TaskModel {
       'colorindex': colorindex,
       'isCompleted': isCompleted,
       'taskColor': taskColor,
+      'category': category,
     };
   }
 
   factory TaskModel.fromMap(Map<String, dynamic> map) {
     return TaskModel(
-      id: map['id'] != null ? map['id'] as int : null,
-      title: map['title'] as String,
-      note: map['note'] as String,
-      date: map['date'] as String,
-      starttime: map['starttime'] as String,
-      endtime: map['endtime'] as String,
-      repeat: map['repeat'] as String,
-      reminder: map['reminder'] as int,
-      colorindex: map['colorindex'] as int,
-      isCompleted:
-          map['isCompleted'] != null ? map['isCompleted'] as int : null,
-      taskColor: map['taskColor'] != null ? map['taskColor'] as Color : null,
-    );
+        id: map['id'] != null ? map['id'] as int : null,
+        title: map['title'] as String,
+        note: map['note'] as String,
+        date: map['date'] as String,
+        starttime: map['starttime'] as String,
+        endtime: map['endtime'] as String,
+        repeat: map['repeat'] as String,
+        reminder: map['reminder'] as int,
+        colorindex: map['colorindex'] as int,
+        isCompleted:
+            map['isCompleted'] != null ? map['isCompleted'] as int : null,
+        taskColor: map['taskColor'] != null ? map['taskColor'] as Color : null,
+        category: map['category'] as String
+        // Validate category
+        );
   }
 
   String toJson() => json.encode(toMap());
@@ -96,7 +117,7 @@ class TaskModel {
 
   @override
   String toString() {
-    return 'TaskModel(id: $id, title: $title, note: $note, date: $date, starttime: $starttime, endtime: $endtime, repeat: $repeat, reminder: $reminder, colorindex: $colorindex, isCompleted: $isCompleted,taskColor: $taskColor)';
+    return 'TaskModel(id: $id, title: $title, note: $note, date: $date, starttime: $starttime, endtime: $endtime, repeat: $repeat, reminder: $reminder, colorindex: $colorindex, isCompleted: $isCompleted, taskColor: $taskColor, category: $category)';
   }
 
   @override
@@ -113,7 +134,8 @@ class TaskModel {
         other.reminder == reminder &&
         other.colorindex == colorindex &&
         other.isCompleted == isCompleted &&
-        other.taskColor == taskColor;
+        other.taskColor == taskColor &&
+        other.category == category;
   }
 
   @override
@@ -128,6 +150,12 @@ class TaskModel {
         reminder.hashCode ^
         colorindex.hashCode ^
         isCompleted.hashCode ^
-        taskColor.hashCode;
+        taskColor.hashCode ^
+        category.hashCode;
+  }
+
+  // Fetch unique categories from tasks
+  static List<String> getCategories(List<TaskModel> tasks) {
+    return tasks.map((task) => task.category).toSet().toList();
   }
 }

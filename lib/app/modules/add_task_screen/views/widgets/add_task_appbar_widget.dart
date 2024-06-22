@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 class MyAppBar extends StatefulWidget {
@@ -26,7 +27,7 @@ class _MyAppBarState extends State<MyAppBar> {
           ),
         ),
         Text(
-          widget.isEditMote ? 'Update Task' : 'Add Task',
+          widget.isEditMote ? 'UpdateTask'.tr : 'addTask'.tr,
           style: Theme.of(context).textTheme.titleLarge,
         ),
         const SizedBox()

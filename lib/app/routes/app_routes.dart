@@ -6,6 +6,8 @@ abstract class Routes {
   static const HOME = _Paths.HOME;
   static const ADD_TASK_SCREEN = _Paths.ADD_TASK_SCREEN;
   static const ONBOARDING_SCREEN = _Paths.ONBOARDING_SCREEN;
+  static const ANALYSIS = _Paths.ANALYSIS;
+  static const NOTIFICATION = _Paths.NOTIFICATION;
 }
 
 abstract class _Paths {
@@ -13,4 +15,6 @@ abstract class _Paths {
   static const HOME = '/home';
   static const ADD_TASK_SCREEN = '/add-task-screen';
   static const ONBOARDING_SCREEN = '/onboarding-screen';
+  static const ANALYSIS = '/analysis';
+  static const NOTIFICATION = '/notification';
 }

@@ -7,7 +7,6 @@ environment:
 
 dependencies: 
   cupertino_icons: ^1.0.2
-  get_cli: ^1.8.4
   get_storage: any
   intl: any
   google_fonts: any
@@ -17,8 +16,11 @@ dependencies:
   date_picker_timeline: 1.2.5
   sizer: 2.0.15
   sqflite: 2.3.0
+  fl_chart: ^0.68.0
+  package_info_plus: ^8.0.0
   day_night_time_picker: 
   device_preview:
+  percent_indicator: ^4.2.3
   get: 4.6.5
   flutter: 
     sdk: flutter

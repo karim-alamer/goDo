@@ -10,6 +10,8 @@ class AddCalendarWidget extends GetView<HomeController> {
   Widget build(BuildContext context) {
     //remove the currentlocale from there
     Locale currentLocale = Get.locale ?? const Locale('en', 'US');
+    final datePickerController = DatePickerController();
+    DateTime selectedDate = DateTime.now();
     return Obx(() {
       if (controller.isLoading.value) {
         return const Center(
@@ -23,7 +25,7 @@ class AddCalendarWidget extends GetView<HomeController> {
             height: 100,
             width: 80,
             initialSelectedDate: DateTime.now(),
-            selectionColor: Colors.lightBlue,
+            selectionColor: const Color(0xFF22385C),
             selectedTextColor: Colors.white,
             dateTextStyle:
                 const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
@@ -31,10 +33,12 @@ class AddCalendarWidget extends GetView<HomeController> {
                 const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             monthTextStyle:
                 const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            controller: datePickerController,
             onDateChange: (date) {
               print("//////>>>>>>>>>>>>>>>>>>>>>////");
-              controller.getTasksByDate(
-                  date); // Use the controller to call setSelectedDate
+              selectedDate = date;
+              controller
+                  .getAllTasks(); // Use the controller to call setSelectedDate
             },
             locale: currentLocale.languageCode,
           ),

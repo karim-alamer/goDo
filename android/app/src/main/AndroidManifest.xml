@@ -3,7 +3,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
-        android:label="go_do"
+        android:label="GoDo"
         android:name="${applicationName}"
         android:icon="@mipmap/godo_logo">
         <service android:name="com.dexterous.flutterlocalnotifications.ForegroundService" android:stopWithTask="false" />

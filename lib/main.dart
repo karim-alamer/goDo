@@ -6,12 +6,9 @@ import 'package:timezone/data/latest.dart' as tzdata;
 void main() {
   tzdata.initializeTimeZones();
   WidgetsFlutterBinding.ensureInitialized();
- 
   final NotifyHelperService notifyHelper = NotifyHelperService();
   notifyHelper.setup();
-
   runApp(
     const MyApp(),
   );
 }
-

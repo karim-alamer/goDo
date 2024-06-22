@@ -1,3 +1,4 @@
+// import 'package:day_night_time_picker/lib/daynight_timepicker.dart';
 import 'package:day_night_time_picker/lib/daynight_timepicker.dart';
 import 'package:day_night_time_picker/lib/state/time.dart';
 import 'package:flutter/material.dart';
@@ -27,28 +28,27 @@ class TaskFormWidget extends StatefulWidget {
 class _TaskFormWidgetState extends State<TaskFormWidget> {
   bool validation() {
     final DateTime now = DateTime.now();
+
     final DateTime taskStartTime = DateTime(currentdate.year, currentdate.month,
         currentdate.day, _starthour.hour, _starthour.minute);
     final DateTime taskEndTime = DateTime(currentdate.year, currentdate.month,
         currentdate.day, endhour.hour, endhour.minute);
 
     if (taskStartTime.isBefore(now)) {
-      // Get.showSnackbar(SnackBar(content: content))
-      showSnackbar("Invalid start time: Start time is in the past");
+      showSnackbar("Invalidstarttime".tr);
       return false;
     }
 
     if (taskEndTime.isBefore(now)) {
-      showSnackbar("Invalid end time: End time is in the past.");
+      showSnackbar("Invalidendtime".tr);
       return false;
     }
 
     if (taskEndTime.isBefore(taskStartTime)) {
-      showSnackbar("Invalid time range: End time is before start time.");
+      showSnackbar("Invalidtimerange".tr);
       return false;
     }
 
-    // Calculate the notification time
     final int notificationMinutes = _selectedReminder;
     final DateTime notificationTime =
         taskStartTime.subtract(Duration(minutes: notificationMinutes));
@@ -70,7 +70,6 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
     );
   }
 
-  // final HomeController taskcontroller = Get.put(HomeController());
   get isEditMode => widget.task != null;
   late TextEditingController _titlecontroller;
   late TextEditingController _notecontroller;
@@ -81,35 +80,70 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
   var endhour = TimeOfDay.now();
   late int _selectedReminder;
   late int _selectedcolor;
+  late String _selectedCategory;
   final _formKey = GlobalKey<FormState>();
+
   List<Color> colors = const [
     Color(0xffDAD3C8),
     Color(0xffFFE5DE),
     Color(0xffDCF6E6),
   ];
-  List<DropdownMenuItem<int>> menuItems = const [
+  List<DropdownMenuItem<int>> menuItems = [
     DropdownMenuItem(
       value: 5,
       child: Text(
-        "5 Min Earlier",
+        '5MinEarlier'.tr,
       ),
     ),
     DropdownMenuItem(
       value: 10,
       child: Text(
-        "10 Min Earlier",
+        '10MinEarlier'.tr,
       ),
     ),
     DropdownMenuItem(
       value: 15,
       child: Text(
-        "15 Min Earlier",
+        '15MinEarlier'.tr,
       ),
     ),
     DropdownMenuItem(
       value: 20,
       child: Text(
-        "20 Min Earlier",
+        '20MinEarlier'.tr,
+      ),
+    ),
+  ];
+
+  List<DropdownMenuItem<String>> menuItemsCategories = [
+    DropdownMenuItem(
+      value: 'task',
+      child: Text(
+        "TaskM".tr,
+      ),
+    ),
+    DropdownMenuItem(
+      value: 'study',
+      child: Text(
+        "StudyM".tr,
+      ),
+    ),
+    DropdownMenuItem(
+      value: 'sport',
+      child: Text(
+        "SportM".tr,
+      ),
+    ),
+    DropdownMenuItem(
+      value: 'health',
+      child: Text(
+        "HealthM".tr,
+      ),
+    ),
+    DropdownMenuItem(
+      value: 'work',
+      child: Text(
+        "WorkM".tr,
       ),
     ),
   ];
@@ -121,7 +155,6 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
         TextEditingController(text: isEditMode ? widget.task!.title : '');
     _notecontroller =
         TextEditingController(text: isEditMode ? widget.task!.note : '');
-
     currentdate =
         isEditMode ? DateTime.parse(widget.task!.date) : DateTime.now();
     endhour = TimeOfDay(
@@ -130,16 +163,18 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
     );
     _selectedReminder = isEditMode ? widget.task!.reminder : 5;
     _selectedcolor = isEditMode ? widget.task!.colorindex : 0;
+    _selectedCategory = isEditMode ? widget.task!.category : 'task';
   }
 
   @override
   Widget build(BuildContext context) {
     return Form(
-        key: _formKey,
-        child: Container(
-          margin: const EdgeInsets.only(left: 20, right: 20),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      key: _formKey,
+      child: Container(
+        margin: const EdgeInsets.only(left: 20, right: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
             SizedBox(
               height: 1.h,
             ),
@@ -147,51 +182,40 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
               context: context,
               isEditMote: isEditMode,
             ),
-            // _buildAppBar(context),
             SizedBox(
               height: 3.h,
             ),
-            const Text(
-              "Title",
-            ),
+            Text('Titletask'.tr),
             SizedBox(
               height: 1.h,
             ),
             MyTextField(
-              hint: 'Enter Title',
+              hint: 'EnterTitle'.tr,
               icon: Icons.title,
               showicon: true,
               validator: (value) {
-                return value!.isEmpty ? "Please Enter A Title" : null;
+                return value!.isEmpty ? "PleaseEnterATitle".tr : null;
               },
               textEditingController: _titlecontroller,
             ),
             SizedBox(
               height: 2.h,
             ),
-            const Text(
-              'Note',
-            ),
+            Text('Notetask'.tr),
             SizedBox(
               height: 1.h,
             ),
             MyTextField(
-              hint: 'Enter Note',
-              icon: Icons.ac_unit,
+              hint: 'EnterNote'.tr,
+              icon: Icons.note,
               showicon: true,
               maxlenght: 200,
               validator: (value) {
-                return value!.isEmpty ? "Please Enter A Note" : null;
+                return value!.isEmpty ? "PleaseEnterANote".tr : null;
               },
               textEditingController: _notecontroller,
             ),
-            const Text(
-              'Date',
-              // style: Theme.of(context)
-              //     .textTheme
-              //     .headline1!
-              //     .copyWith(fontSize: 14.sp),
-            ),
+            Text('Datetask'.tr),
             SizedBox(
               height: 1.h,
             ),
@@ -215,13 +239,7 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Start Time',
-                        // style: Theme.of(context)
-                        //     .textTheme
-                        //     .headline1!
-                        //     .copyWith(fontSize: 14.sp),
-                      ),
+                      Text('StartTimetask'.tr),
                       SizedBox(
                         height: 1.h,
                       ),
@@ -234,25 +252,26 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                         validator: (value) {},
                         ontap: () {
                           Navigator.push(
-                              context,
-                              showPicker(
-                                value: _starthour,
-                                is24HrFormat: true,
-                                accentColor: Colors.deepPurple,
-                                onChange: (TimeOfDay newvalue) {
-                                  setState(() {
-                                    _starthour = Time(
-                                        hour: newvalue.hour,
-                                        minute: newvalue.minute);
-                                    endhour = TimeOfDay(
-                                      hour: _starthour.hour < 22
-                                          ? _starthour.hour + 1
-                                          : _starthour.hour,
-                                      minute: _starthour.minute,
-                                    );
-                                  });
-                                },
-                              ));
+                            context,
+                            showPicker(
+                              value: _starthour,
+                              is24HrFormat: true,
+                              accentColor: Colors.deepPurple,
+                              onChange: (TimeOfDay newvalue) {
+                                setState(() {
+                                  _starthour = Time(
+                                      hour: newvalue.hour,
+                                      minute: newvalue.minute);
+                                  endhour = TimeOfDay(
+                                    hour: _starthour.hour < 22
+                                        ? _starthour.hour + 1
+                                        : _starthour.hour,
+                                    minute: _starthour.minute,
+                                  );
+                                });
+                              },
+                            ),
+                          );
                         },
                         textEditingController: TextEditingController(),
                       ),
@@ -266,9 +285,7 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'End Time',
-                      ),
+                      Text('EndTimetask'.tr),
                       SizedBox(
                         height: 1.h,
                       ),
@@ -281,19 +298,20 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                         validator: (value) {},
                         ontap: () {
                           Navigator.push(
-                              context,
-                              showPicker(
-                                value: Time(
-                                    hour: endhour.hour, minute: endhour.minute),
-                                is24HrFormat: true,
-                                minHour: _starthour.hour.toDouble() - 1,
-                                accentColor: Colors.lightBlue,
-                                onChange: (TimeOfDay newvalue) {
-                                  setState(() {
-                                    endhour = newvalue;
-                                  });
-                                },
-                              ));
+                            context,
+                            showPicker(
+                              value: Time(
+                                  hour: endhour.hour, minute: endhour.minute),
+                              is24HrFormat: true,
+                              minHour: _starthour.hour.toDouble() - 1,
+                              accentColor: Colors.lightBlue,
+                              onChange: (TimeOfDay newvalue) {
+                                setState(() {
+                                  endhour = newvalue;
+                                });
+                              },
+                            ),
+                          );
                         },
                         textEditingController: TextEditingController(),
                       ),
@@ -305,13 +323,11 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
             SizedBox(
               height: 2.h,
             ),
-            const Text(
-              'Reminder',
-            ),
+            Text('Remindertask'.tr),
             SizedBox(
               height: 1.h,
             ),
-            DropdownButtonFormField(
+            DropdownButtonFormField<int>(
               style: Theme.of(context).textTheme.headline1!.copyWith(
                   fontSize: 9.sp,
                   color: const Color.fromARGB(255, 108, 108, 106)),
@@ -338,28 +354,54 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
                 _selectedReminder = value!;
               }),
             ),
-
             SizedBox(
               height: 2.h,
             ),
-
+            Text('Categorytask'.tr),
+            SizedBox(
+              height: 1.h,
+            ),
+            DropdownButtonFormField<String>(
+              decoration: InputDecoration(
+                fillColor: Colors.grey.shade200,
+                filled: true,
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide(
+                      color: Colors.grey.shade200,
+                      width: 0,
+                    )),
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
+              ),
+              items: menuItemsCategories,
+              value: _selectedCategory,
+              onChanged: (value) => setState(() {
+                _selectedCategory = value!;
+                print(_selectedCategory);
+              }),
+            ),
+            SizedBox(
+              height: 2.h,
+            ),
             Center(
               widthFactor: 10.0,
-              //container insteaded sizebox
               child: SizedBox(
                 height: 60,
                 width: 150,
                 child: MyButton(
                   color: Colors.lightBlue,
-                  title: isEditMode ? "Update Task" : 'Create Task',
+                  title: isEditMode ? 'UpdatetaskForm'.tr : 'CreatetaskForm'.tr,
                   func: () async {
                     await _addTask();
                   },
                 ),
               ),
-            )
-          ]),
-        ));
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   _showdatepicker() async {
@@ -371,7 +413,6 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
       currentDate: DateTime.now(),
     );
 
-//TODO
     setState(() {
       selecteddate != null ? currentdate = selecteddate : null;
     });
@@ -388,6 +429,7 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
         endHour: endhour,
         selectedReminder: _selectedReminder,
         selectedColor: _selectedcolor,
+        selectedCategory: _selectedCategory,
         isEditMode: widget.task != null,
         taskId: widget.task?.id,
       );

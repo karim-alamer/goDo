@@ -1,20 +1,29 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart' as getx;
+import 'package:intl/intl.dart';
 import 'package:get/get.dart';
 
 import 'package:go_do/app/data/models/task.dart';
 import 'package:go_do/repositry/task_db.dart';
 import 'package:go_do/services/notify_service.dart';
-import 'package:intl/intl.dart';
-
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../../../routes/app_pages.dart';
 
 class HomeController extends GetxController {
-  getx.RxList<TaskModel> statictaskList = <TaskModel>[].obs;
-  getx.Rx<DateTime> selectedDate = DateTime.now().obs;
-  getx.RxList<TaskModel> filteredTaskList = <TaskModel>[].obs;
-  getx.RxBool isLoading = true.obs;
+  RxList<TaskModel> statictaskList = <TaskModel>[].obs;
+  Rx<DateTime> selectedDate = DateTime.now().obs;
+  RxList<TaskModel> filteredTaskList = <TaskModel>[].obs;
+  RxBool isLoading = true.obs;
+  RxString appVersion = ''.obs;
+
+  @override
+  Future<void> onInit() async {
+    super.onInit();
+    await _fetchAppVersion();
+    await requestNotificationPermission();
+    await getAllTasks();
+  }
+
   Future<void> requestNotificationPermission() async {
     bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
     if (!isAllowed) {
@@ -24,13 +33,31 @@ class HomeController extends GetxController {
 
   Future<void> getAllTasks() async {
     List<Map<String, dynamic>> taskData = await SQLHelper().queryAllTasks();
-    filteredTaskList.assignAll(
-      taskData.map((task) => TaskModel.fromMap(task)).toList(),
-    );
+    List<TaskModel> tasks =
+        taskData.map((task) => TaskModel.fromMap(task)).toList();
+
+    DateTime parseDateTime(String date, String time) {
+      // Convert 12-hour format with AM/PM to 24-hour format
+      final DateFormat dateFormat = DateFormat('yyyy-MM-dd hh:mm a');
+      return dateFormat.parse('$date $time');
+    }
+
+    // Sort the tasks
+    tasks.sort((a, b) {
+      DateTime aDateTime = parseDateTime(a.date, a.starttime);
+      DateTime bDateTime = parseDateTime(b.date, b.starttime);
+      if (a.isCompleted == 1 && b.isCompleted != 1) {
+        return 1; // Move completed tasks to the end
+      } else if (a.isCompleted != 1 && b.isCompleted == 1) {
+        return -1;
+      }
+      return aDateTime.compareTo(bDateTime);
+    });
+
+    filteredTaskList.assignAll(tasks);
     isLoading.value = false;
   }
 
-  // Function to update the selected date and filter tasks
   void setSelectedDate(DateTime date) {
     selectedDate.value = date;
     getTasksByDate(date);
@@ -66,10 +93,8 @@ class HomeController extends GetxController {
     }
   }
 
-  // Function to filter tasks by date
   Future<void> getTasksByDate([DateTime? date]) async {
     if (date == null) {
-      print("i am heeeeeeeeeeeeeeeeeeeeeeeeeeeeeer");
       await getAllTasks();
       filteredTaskList.forEach((task) {
         DateTime taskDate = DateTime.parse(task.date);
@@ -82,15 +107,13 @@ class HomeController extends GetxController {
             taskDate.day == currentDate.day) {
           task.taskColor = Colors.white;
         } else {
-          task.taskColor = const Color.fromARGB(
-              255, 226, 225, 225); // Use your existing color logic
+          task.taskColor = const Color.fromARGB(255, 226, 225, 225);
         }
       });
     } else {
       selectedDate.value = date;
       await getAllTasks();
       final filter_data = filteredTaskList.where((task) {
-        // Convert the task date (String) to DateTime
         DateTime taskDate = DateTime.parse(task.date);
 
         return taskDate.year == selectedDate.value.year &&
@@ -108,7 +131,7 @@ class HomeController extends GetxController {
             taskDate.day == currentDate.day) {
           task.taskColor = Colors.red;
         } else {
-          task.taskColor = Colors.white; // Use your existing color logic
+          task.taskColor = Colors.white;
         }
       });
       filteredTaskList.assignAll(filter_data);
@@ -125,70 +148,75 @@ class HomeController extends GetxController {
     required TimeOfDay endHour,
     required int selectedReminder,
     required int selectedColor,
+    required String selectedCategory,
     required bool isEditMode,
     required int? taskId,
   }) async {
     showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-              title: const Text(
-                'Add a New task',
-                style: TextStyle(fontFamily: 'Cairo'),
-              ),
-              content: const Text('do you want to add a new task?'),
-              actions: [
-                TextButton(
-                  onPressed: () async {
-                    TaskModel task = TaskModel(
-                        title: titleController.text,
-                        note: noteController.text,
-                        date: DateFormat('yyyy-MM-dd').format(currentDate),
-                        starttime: startHour.format(context),
-                        endtime: endHour.format(context),
-                        reminder: selectedReminder,
-                        colorindex: selectedColor,
-                        repeat: "all day",
-                        isCompleted: 0);
-                    if (isEditMode) {
-                      await upateItem(task, taskId);
-                    } else {
-                      await addTask(task);
-                    }
-                    final DateTime taskStartTime = DateTime(
-                        currentDate.year,
-                        currentDate.month,
-                        currentDate.day,
-                        startHour.hour,
-                        startHour.minute);
-                    final DateTime notifacationTime = taskStartTime
-                        .subtract(Duration(minutes: selectedReminder));
-                    //format the notifacation messae
-                    final String notifacationTitle = titleController.text;
-                    final String notifacationBody = noteController.text;
-                    NotifyHelperService().scheduleNotification(
-                        notifacationTitle, notifacationBody, notifacationTime);
-                    Get.offAllNamed(Routes.HOME);
-
-                    // Get.offAll(const HomeView());
-                  },
-                  child: Text('Okpopup'.tr),
-                ),
-                TextButton(
-                onPressed: () {
-                  Get.back();
-                },
-                child: Text('cancelpopup'.tr),
-              ),
-              ]);
-        });
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'AddaNewtask'.tr,
+            style: const TextStyle(fontFamily: 'Cairo'),
+          ),
+          content: Text('doyouwanttoaddanewtask?'.tr),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                TaskModel task = TaskModel(
+                  title: titleController.text,
+                  note: noteController.text,
+                  date: DateFormat('yyyy-MM-dd').format(currentDate),
+                  starttime: startHour.format(context),
+                  endtime: endHour.format(context),
+                  reminder: selectedReminder,
+                  colorindex: selectedColor,
+                  repeat: "all day",
+                  isCompleted: 0,
+                  category: selectedCategory,
+                );
+                if (isEditMode) {
+                  await upateItem(task, taskId);
+                } else {
+                  await addTask(task);
+                }
+                final DateTime taskStartTime = DateTime(
+                  currentDate.year,
+                  currentDate.month,
+                  currentDate.day,
+                  startHour.hour,
+                  startHour.minute,
+                );
+                final DateTime notifacationTime = taskStartTime.subtract(
+                  Duration(minutes: selectedReminder),
+                );
+                final String notifacationTitle = titleController.text;
+                final String notifacationBody = noteController.text;
+                NotifyHelperService().scheduleNotification(
+                  notifacationTitle,
+                  notifacationBody,
+                  notifacationTime,
+                );
+                Get.offAllNamed(Routes.HOME);
+              },
+              child: Text('Okpopup'.tr),
+            ),
+            TextButton(
+              onPressed: () {
+                Get.back();
+              },
+              child: Text('cancelpopup'.tr),
+            ),
+          ],
+        );
+      },
+    );
   }
 
-  @override
-  void onInit() {
-    super.onInit();
-    requestNotificationPermission();
-    getTasksByDate();
+  Future<void> _fetchAppVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    appVersion.value = packageInfo.version;
   }
 
   @override

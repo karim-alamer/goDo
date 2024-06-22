@@ -21,20 +21,41 @@ class SQLHelper {
   }
 
   _onCreate(Database db, int version) async {
-    await db.execute("""CREATE TABLE tasks_table(
-         id INTEGER PRIMARY KEY AUTOINCREMENT, title STRING ,note STRING,date STRING,starttime STRING,endtime STRING,repeat STRING,reminder INTEGER,colorindex INTEGER,isCompleted INTEGER,taskColor INTEGER
-        )""");
+    await db.execute("""CREATE TABLE $_taskstable(
+       id INTEGER PRIMARY KEY AUTOINCREMENT, 
+       title STRING, 
+       note STRING,
+       date STRING,
+       starttime STRING,
+       endtime STRING,
+       repeat STRING,
+       reminder INTEGER,
+       colorindex INTEGER,
+       isCompleted INTEGER,
+       taskColor INTEGER,
+       category STRING  
+      )""");
   }
 
   Future<int> insertTask(TaskModel task) async {
     Database? db = await database;
-
     return db.insert(_taskstable, task.toMap());
   }
 
   Future<List<Map<String, dynamic>>> queryAllTasks() async {
     Database? db = await database;
     return await db.query(_taskstable);
+  }
+
+  Future<List<Map<String, dynamic>>> filterTaskByDate(DateTime date) async {
+    Database? db = await database;
+    String formattedDate = '${date.year}-${date.month}-${date.day}';
+    return await db.query(
+      _taskstable,
+      where: 'date LIKE ?',
+      whereArgs: [formattedDate],
+      orderBy: 'date DESC',
+    );
   }
 
   Future<int> delete(int id) async {
@@ -45,28 +66,43 @@ class SQLHelper {
   Future<int> update(TaskModel task, int? id) async {
     Database? db = await database;
     final result = await db.rawUpdate(
-        '''UPDATE $_taskstable SET title = ?, note = ?, date = ?, starttime= ?, endtime = ?, repeat = ?, reminder = ?, colorindex = ?, isCompleted = ?, taskColor=? WHERE id = ?''',
-        [
-          task.title,
-          task.note,
-          task.date.toString(),
-          task.starttime.toString(),
-          task.endtime.toString(),
-          task.repeat,
-          task.reminder,
-          task.colorindex,
-          task.isCompleted,
-          task.taskColor,
-          id
-        ]);
+      '''UPDATE $_taskstable SET 
+        title = ?, 
+        note = ?, 
+        date = ?, 
+        starttime = ?, 
+        endtime = ?, 
+        repeat = ?, 
+        reminder = ?, 
+        colorindex = ?, 
+        isCompleted = ?, 
+        taskColor = ?, 
+        category = ? 
+        WHERE id = ?''',
+      [
+        task.title,
+        task.note,
+        task.date,
+        task.starttime,
+        task.endtime,
+        task.repeat,
+        task.reminder,
+        task.colorindex,
+        task.isCompleted,
+        task.taskColor,
+        task.category,
+        id
+      ],
+    );
     return result;
   }
 
   Future<int> updateTaskComplete(bool? value, int? id) async {
     Database? db = await database;
     final result = await db.rawUpdate(
-        '''UPDATE $_taskstable SET  isCompleted = ? WHERE id = ?''',
-        [value, id]);
+      '''UPDATE $_taskstable SET isCompleted = ? WHERE id = ?''',
+      [value, id],
+    );
     return result;
   }
 }

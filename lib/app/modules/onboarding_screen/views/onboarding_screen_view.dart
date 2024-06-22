@@ -4,7 +4,6 @@ import 'package:go_do/app/modules/onboarding_screen/views/widgets/onboarding_bod
 import '../../../../size_config.dart';
 import '../../../routes/app_pages.dart';
 
-
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({Key? key}) : super(key: key);
 
@@ -178,7 +177,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(50),
                                   ),
-                                   elevation: 1.0,
+                                  elevation: 1.0,
                                   padding: (width <= 550)
                                       ? const EdgeInsets.symmetric(
                                           horizontal: 30, vertical: 20)
